@@ -16,7 +16,7 @@ const Todos = React.createClass({
     const todosKeys = Object.keys(localStorage)
     const todos = []
 
-    //let key of todosKeys遍历新写法
+   //let key of todosKeys遍历新写法,可以用来遍历对象属性
     for (let key of todosKeys){
       // 通过localStorage.getItem(key),获取每一个key对应的那个localStorage数组
       //JSON.parse()方法可以把一个json字符串解析成一个对象或者数组
@@ -39,10 +39,11 @@ const Todos = React.createClass({
   },
 // 输入框回车键触发的事件,form标签独有的事件
   handleSubmit(event){
-    event.preventDefault()  //阻止事件刷新
+    event.preventDefault()  //event.preventDefault()取消事件的默认行为(阻止事件刷新)
     const todo = {
       title:this.state.title,
       done:false,
+      //获取一个唯一的,以日期演变过来的值
       id:+new Date()
     }
     // 使用localStorage.setItem方法,将todo的id变成浏览器localStorage
@@ -75,28 +76,31 @@ const Todos = React.createClass({
 
 handleClick(key,event){
   const todo = JSON.parse(localStorage.getItem('id:'+key))
-    if(todo.done===false){
+  // console.log(todo)
+  if(todo.done===false){
     todo.done=true;
     localStorage.setItem('id:'+todo.id, JSON.stringify(todo))
   }else{
   todo.done = false;
   localStorage.setItem('id:'+todo.id, JSON.stringify(todo))
   }
-  const todosKeys = Object.keys(localStorage)
-  const todos = []
-    //let key of todosKeys遍历新写法
-    for (let key of todosKeys){
-      // 通过localStorage.getItem(key),获取每一个key对应的那个localStorage数组
-      //JSON.parse()方法可以把一个json字符串解析成一个对象或者数组
-      const todo = JSON.parse(localStorage.getItem(key))
-      // 使用push方法将每个todo的值添加到数组todos中成为数组todos的一条数据
-      //[数组].push(数据):push前面必须是一个数组
-      todos.push(todo)
+  //修改todos方法一:
+  // const todosKeys = Object.keys(localStorage)
+  // const todos = []
+  // for (let key of todosKeys){
+  //   const todo = JSON.parse(localStorage.getItem(key))
+  //   todos.push(todo)
+  // }
+  // 修改todos方法2:
+  const todos=this.state.todos
+  for(let i=0;i<todos.length;i++){
+    if(todos[i].id===todo.id){
+      todos.splice(i,1,todo);
     }
-    // 改变state属性中的todos为当前的todos
-    this.setState({
-      todos:todos
-    })
+  }
+  this.setState({
+    todos:todos
+  })
 },
 
   render(){

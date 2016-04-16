@@ -74,7 +74,7 @@
 	    var todosKeys = Object.keys(localStorage);
 	    var todos = [];
 
-	    //let key of todosKeys遍历新写法
+	    //let key of todosKeys遍历新写法,可以用来遍历对象属性
 	    var _iteratorNormalCompletion = true;
 	    var _didIteratorError = false;
 	    var _iteratorError = undefined;
@@ -121,10 +121,11 @@
 
 	  // 输入框回车键触发的事件,form标签独有的事件
 	  handleSubmit: function handleSubmit(event) {
-	    event.preventDefault(); //阻止事件刷新
+	    event.preventDefault(); //event.preventDefault()取消事件的默认行为(阻止事件刷新)
 	    var todo = {
 	      title: this.state.title,
 	      done: false,
+	      //获取一个唯一的,以日期演变过来的值
 	      id: +new Date()
 	    };
 	    // 使用localStorage.setItem方法,将todo的id变成浏览器localStorage
@@ -158,6 +159,7 @@
 	  },
 	  handleClick: function handleClick(key, event) {
 	    var todo = JSON.parse(localStorage.getItem('id:' + key));
+	    // console.log(todo)
 	    if (todo.done === false) {
 	      todo.done = true;
 	      localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
@@ -165,40 +167,20 @@
 	      todo.done = false;
 	      localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
 	    }
-	    var todosKeys = Object.keys(localStorage);
-	    var todos = [];
-	    //let key of todosKeys遍历新写法
-	    var _iteratorNormalCompletion2 = true;
-	    var _didIteratorError2 = false;
-	    var _iteratorError2 = undefined;
-
-	    try {
-	      for (var _iterator2 = todosKeys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-	        var _key = _step2.value;
-
-	        // 通过localStorage.getItem(key),获取每一个key对应的那个localStorage数组
-	        //JSON.parse()方法可以把一个json字符串解析成一个对象或者数组
-	        var _todo = JSON.parse(localStorage.getItem(_key));
-	        // 使用push方法将每个todo的值添加到数组todos中成为数组todos的一条数据
-	        //[数组].push(数据):push前面必须是一个数组
-	        todos.push(_todo);
-	      }
-	      // 改变state属性中的todos为当前的todos
-	    } catch (err) {
-	      _didIteratorError2 = true;
-	      _iteratorError2 = err;
-	    } finally {
-	      try {
-	        if (!_iteratorNormalCompletion2 && _iterator2.return) {
-	          _iterator2.return();
-	        }
-	      } finally {
-	        if (_didIteratorError2) {
-	          throw _iteratorError2;
-	        }
+	    //修改todos方法一:
+	    // const todosKeys = Object.keys(localStorage)
+	    // const todos = []
+	    // for (let key of todosKeys){
+	    //   const todo = JSON.parse(localStorage.getItem(key))
+	    //   todos.push(todo)
+	    // }
+	    // 修改todos方法2:
+	    var todos = this.state.todos;
+	    for (var i = 0; i < todos.length; i++) {
+	      if (todos[i].id === todo.id) {
+	        todos.splice(i, 1, todo);
 	      }
 	    }
-
 	    this.setState({
 	      todos: todos
 	    });
