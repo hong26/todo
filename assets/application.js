@@ -61,12 +61,20 @@
 	  getInitialState: function getInitialState() {
 	    return {
 	      todos: [],
+	      // 定义一个title,主要用于监测输入框输入的内容然后把输入内容传导给
+	      // title,再将输入内容传导给todo数组里的title,todo数组在handleSubmit组件中定义
 	      title: ''
 	    };
 	  },
+
+
+	  //使网页每次刷新后会自动去获取浏览器localStorage里面的内容
 	  componentDidMount: function componentDidMount() {
+	    //使用Object.keys这个封装函数获取localStorage里面的所有key,获取后是一个数组赋值给todosKeys
 	    var todosKeys = Object.keys(localStorage);
 	    var todos = [];
+
+	    //let key of todosKeys遍历新写法
 	    var _iteratorNormalCompletion = true;
 	    var _didIteratorError = false;
 	    var _iteratorError = undefined;
@@ -75,9 +83,14 @@
 	      for (var _iterator = todosKeys[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	        var key = _step.value;
 
+	        // 通过localStorage.getItem(key),获取每一个key对应的那个localStorage数组
+	        //JSON.parse()方法可以把一个json字符串解析成一个对象或者数组
 	        var todo = JSON.parse(localStorage.getItem(key));
+	        // 使用push方法将每个todo的值添加到数组todos中成为数组todos的一条数据
+	        //[数组].push(数据):push前面必须是一个数组
 	        todos.push(todo);
 	      }
+	      // 改变state属性中的todos为当前的todos
 	    } catch (err) {
 	      _didIteratorError = true;
 	      _iteratorError = err;
@@ -97,62 +110,136 @@
 	      todos: todos
 	    });
 	  },
-	  handleSubmit: function handleSubmit(event) {
-	    event.preventDefault();
-	    var todo = {
-	      title: this.state.title,
-	      done: false,
-	      id: +new Date()
-	    };
-	    localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
-	    this.setState({
-	      todos: this.state.todos.concat([todo])
-	    });
-	  },
+
+
+	  // 监测输入框内容然后传导给title
 	  handleChange: function handleChange(event) {
 	    this.setState({
 	      title: event.target.value
 	    });
 	  },
-	  handleClick: function handleClick(event) {
+
+	  // 输入框回车键触发的事件,form标签独有的事件
+	  handleSubmit: function handleSubmit(event) {
+	    event.preventDefault(); //阻止事件刷新
+	    var todo = {
+	      title: this.state.title,
+	      done: false,
+	      id: +new Date()
+	    };
+	    // 使用localStorage.setItem方法,将todo的id变成浏览器localStorage
+	    // 的key,再将todo整个数组通过JSON.stringify()方法转化成json字符串传递给浏览
+	    // 器的localStorage成为他的value.
+	    // JSON.stringify() 方法可以将任意的 JavaScript 值序列化成 JSON 字符串
+	    localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
+	    this.setState({
+	      // concat() 方法用于连接两个或多个数组。
+	      todos: this.state.todos.concat([todo]),
+	      title: ''
+	    });
+	  },
+
+	  // 清空按钮
+	  click: function click(event) {
 	    localStorage.clear();
 	    this.setState({ todos: [], title: '' });
 	  },
+
+	  // 每一个title的删除按钮
 	  handleDelete: function handleDelete(id, event) {
+	    // 删除 localStorage里面符合的条目
 	    localStorage.removeItem('id:' + id);
+	    // filter(x)函数目的是筛选数组,把数组里面的x(x为参数)单独提取出来变成一个新数组.
+	    // 加了!就是相反,把数组里面没有x的单独提取出来变成一个新数组
 	    var todos = this.state.todos.filter(function (item) {
 	      return item.id != id;
 	    });
 	    this.setState({ todos: todos });
+	  },
+	  handleClick: function handleClick(key, event) {
+	    var todo = JSON.parse(localStorage.getItem('id:' + key));
+	    if (todo.done === false) {
+	      todo.done = true;
+	      localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
+	    } else {
+	      todo.done = false;
+	      localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
+	    }
+	    var todosKeys = Object.keys(localStorage);
+	    var todos = [];
+	    //let key of todosKeys遍历新写法
+	    var _iteratorNormalCompletion2 = true;
+	    var _didIteratorError2 = false;
+	    var _iteratorError2 = undefined;
+
+	    try {
+	      for (var _iterator2 = todosKeys[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	        var _key = _step2.value;
+
+	        // 通过localStorage.getItem(key),获取每一个key对应的那个localStorage数组
+	        //JSON.parse()方法可以把一个json字符串解析成一个对象或者数组
+	        var _todo = JSON.parse(localStorage.getItem(_key));
+	        // 使用push方法将每个todo的值添加到数组todos中成为数组todos的一条数据
+	        //[数组].push(数据):push前面必须是一个数组
+	        todos.push(_todo);
+	      }
+	      // 改变state属性中的todos为当前的todos
+	    } catch (err) {
+	      _didIteratorError2 = true;
+	      _iteratorError2 = err;
+	    } finally {
+	      try {
+	        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+	          _iterator2.return();
+	        }
+	      } finally {
+	        if (_didIteratorError2) {
+	          throw _iteratorError2;
+	        }
+	      }
+	    }
+
+	    this.setState({
+	      todos: todos
+	    });
 	  },
 	  render: function render() {
 	    var _this = this;
 
 	    return _react2.default.createElement(
 	      'div',
-	      null,
-	      this.state.todos.map(function (item, index) {
-	        return _react2.default.createElement(
-	          'div',
-	          { key: index },
-	          _react2.default.createElement(
-	            'span',
-	            null,
-	            item.title
-	          ),
-	          _react2.default.createElement(
-	            'button',
-	            { onClick: _this.handleDelete.bind(_this, item.id) },
-	            'x'
-	          )
-	        );
-	      }),
+	      { style: { textAlign: 'center' } },
+	      _react2.default.createElement(
+	        'h1',
+	        null,
+	        '备忘录'
+	      ),
 	      _react2.default.createElement(
 	        'form',
 	        { onSubmit: this.handleSubmit },
-	        _react2.default.createElement('input', { type: 'text', value: this.state.title, onChange: this.handleChange })
+	        _react2.default.createElement('input', { type: 'text', value: this.state.title, onChange: this.handleChange }),
+	        _react2.default.createElement('span', { style: { display: 'inline-block', width: '2%' } }),
+	        _react2.default.createElement('input', { type: 'button', value: '全部清空', style: { color: 'red', background: '#CCFFFF', cursor: 'pointer' }, onClick: this.click })
 	      ),
-	      _react2.default.createElement('input', { type: 'button', value: '清空', onClick: this.handleClick })
+	      this.state.todos.map(function (item, index) {
+	        // bind(this,item.id)绑定this为当前的this(this不会改变),把当前的item.id传递为handleDelete里面的参数,this可以写为null
+	        return _react2.default.createElement(
+	          'div',
+	          { key: index },
+	          _react2.default.createElement('input', { type: 'checkbox', onChange: _this.handleClick.bind(_this, item.id), checked: item.done }),
+	          _react2.default.createElement(
+	            'span',
+	            { style: { fontSize: '20px', textDecoration: item.done ? 'line-through' : 'none' } },
+	            item.title,
+	            ' '
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { onClick: _this.handleDelete.bind(null, item.id), style: { color: '#CC3333', background: '#fff', cursor: 'pointer' } },
+	            'x'
+	          )
+	        );
+	      })
 	    );
 	  }
 	});
@@ -185,16 +272,19 @@
 
 	'use strict';
 
-	var ReactChildren = __webpack_require__(4);
+	var _assign = __webpack_require__(4);
+
+	var ReactChildren = __webpack_require__(5);
 	var ReactComponent = __webpack_require__(15);
 	var ReactClass = __webpack_require__(21);
 	var ReactDOMFactories = __webpack_require__(26);
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactElementValidator = __webpack_require__(27);
 	var ReactPropTypes = __webpack_require__(29);
 	var ReactVersion = __webpack_require__(30);
 
 	var onlyChild = __webpack_require__(31);
+	var warning = __webpack_require__(10);
 
 	var createElement = ReactElement.createElement;
 	var createFactory = ReactElement.createFactory;
@@ -204,6 +294,17 @@
 	  createElement = ReactElementValidator.createElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
+	}
+
+	var __spread = _assign;
+
+	if (process.env.NODE_ENV !== 'production') {
+	  var warned = false;
+	  __spread = function () {
+	    process.env.NODE_ENV !== 'production' ? warning(warned, 'React.__spread is deprecated and should not be used. Use ' + 'Object.assign directly or another helper function with similar ' + 'semantics. You may be seeing this warning due to your compiler. ' + 'See https://fb.me/react-spread-deprecation for more details.') : void 0;
+	    warned = true;
+	    return _assign.apply(null, arguments);
+	  };
 	}
 
 	var React = {
@@ -238,7 +339,10 @@
 	  // since they are just generating DOM strings.
 	  DOM: ReactDOMFactories,
 
-	  version: ReactVersion
+	  version: ReactVersion,
+
+	  // Deprecated hook for JSX spread, don't use this for anything.
+	  __spread: __spread
 	};
 
 	module.exports = React;
@@ -343,6 +447,51 @@
 
 /***/ },
 /* 4 */
+/***/ function(module, exports) {
+
+	/* eslint-disable no-unused-vars */
+	'use strict';
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+	function toObject(val) {
+		if (val === null || val === undefined) {
+			throw new TypeError('Object.assign cannot be called with null or undefined');
+		}
+
+		return Object(val);
+	}
+
+	module.exports = Object.assign || function (target, source) {
+		var from;
+		var to = toObject(target);
+		var symbols;
+
+		for (var s = 1; s < arguments.length; s++) {
+			from = Object(arguments[s]);
+
+			for (var key in from) {
+				if (hasOwnProperty.call(from, key)) {
+					to[key] = from[key];
+				}
+			}
+
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
+				for (var i = 0; i < symbols.length; i++) {
+					if (propIsEnumerable.call(from, symbols[i])) {
+						to[symbols[i]] = from[symbols[i]];
+					}
+				}
+			}
+		}
+
+		return to;
+	};
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -358,8 +507,8 @@
 
 	'use strict';
 
-	var PooledClass = __webpack_require__(5);
-	var ReactElement = __webpack_require__(7);
+	var PooledClass = __webpack_require__(6);
+	var ReactElement = __webpack_require__(8);
 
 	var emptyFunction = __webpack_require__(11);
 	var traverseAllChildren = __webpack_require__(13);
@@ -530,7 +679,7 @@
 	module.exports = ReactChildren;
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -546,7 +695,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Static poolers. Several custom versions for each potential number of
@@ -655,7 +804,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -710,7 +859,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -726,7 +875,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var ReactCurrentOwner = __webpack_require__(9);
 
@@ -1003,51 +1152,6 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	/* eslint-disable no-unused-vars */
-	'use strict';
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-	function toObject(val) {
-		if (val === null || val === undefined) {
-			throw new TypeError('Object.assign cannot be called with null or undefined');
-		}
-
-		return Object(val);
-	}
-
-	module.exports = Object.assign || function (target, source) {
-		var from;
-		var to = toObject(target);
-		var symbols;
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = Object(arguments[s]);
-
-			for (var key in from) {
-				if (hasOwnProperty.call(from, key)) {
-					to[key] = from[key];
-				}
-			}
-
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
-				for (var i = 0; i < symbols.length; i++) {
-					if (propIsEnumerable.call(from, symbols[i])) {
-						to[symbols[i]] = from[symbols[i]];
-					}
-				}
-			}
-		}
-
-		return to;
-	};
-
-
-/***/ },
 /* 9 */
 /***/ function(module, exports) {
 
@@ -1235,10 +1339,10 @@
 	'use strict';
 
 	var ReactCurrentOwner = __webpack_require__(9);
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 
 	var getIteratorFn = __webpack_require__(14);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	var SEPARATOR = '.';
@@ -1479,7 +1583,7 @@
 
 	var canDefineProperty = __webpack_require__(12);
 	var emptyObject = __webpack_require__(20);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	/**
@@ -1868,16 +1972,16 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var ReactComponent = __webpack_require__(15);
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactPropTypeLocations = __webpack_require__(22);
 	var ReactPropTypeLocationNames = __webpack_require__(24);
 	var ReactNoopUpdateQueue = __webpack_require__(16);
 
 	var emptyObject = __webpack_require__(20);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var keyMirror = __webpack_require__(23);
 	var keyOf = __webpack_require__(25);
 	var warning = __webpack_require__(10);
@@ -2624,7 +2728,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Constructs an enumeration with keys equal to their value.
@@ -2746,7 +2850,7 @@
 
 	'use strict';
 
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactElementValidator = __webpack_require__(27);
 
 	var mapObject = __webpack_require__(28);
@@ -2935,14 +3039,14 @@
 
 	'use strict';
 
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactPropTypeLocations = __webpack_require__(22);
 	var ReactPropTypeLocationNames = __webpack_require__(24);
 	var ReactCurrentOwner = __webpack_require__(9);
 
 	var canDefineProperty = __webpack_require__(12);
 	var getIteratorFn = __webpack_require__(14);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	function getDeclarationErrorAddendum() {
@@ -3270,7 +3374,7 @@
 
 	'use strict';
 
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactPropTypeLocationNames = __webpack_require__(24);
 
 	var emptyFunction = __webpack_require__(11);
@@ -3655,7 +3759,7 @@
 
 	'use strict';
 
-	module.exports = '15.0.0';
+	module.exports = '15.0.1';
 
 /***/ },
 /* 31 */
@@ -3673,9 +3777,9 @@
 	 */
 	'use strict';
 
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Returns the first child in a collection of children and verifies that there
@@ -3835,7 +3939,7 @@
 	var DOMProperty = __webpack_require__(35);
 	var ReactDOMComponentFlags = __webpack_require__(36);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	var ATTR_NAME = DOMProperty.ID_ATTRIBUTE_NAME;
 	var Flags = ReactDOMComponentFlags;
@@ -4024,7 +4128,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	function checkMask(value, bitmask) {
 	  return (value & bitmask) === bitmask;
@@ -5009,7 +5113,7 @@
 
 	var accumulateInto = __webpack_require__(45);
 	var forEachAccumulated = __webpack_require__(46);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Internal store for event listeners
@@ -5244,7 +5348,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Injectable ordering of event plugins.
@@ -5494,7 +5598,7 @@
 	var EventConstants = __webpack_require__(39);
 	var ReactErrorUtils = __webpack_require__(44);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	/**
@@ -5806,7 +5910,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 *
@@ -5946,9 +6050,9 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
-	var PooledClass = __webpack_require__(5);
+	var PooledClass = __webpack_require__(6);
 
 	var getTextContentAccessor = __webpack_require__(49);
 
@@ -6125,9 +6229,9 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
-	var PooledClass = __webpack_require__(5);
+	var PooledClass = __webpack_require__(6);
 
 	var emptyFunction = __webpack_require__(11);
 	var warning = __webpack_require__(10);
@@ -6764,16 +6868,16 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var CallbackQueue = __webpack_require__(55);
-	var PooledClass = __webpack_require__(5);
+	var PooledClass = __webpack_require__(6);
 	var ReactFeatureFlags = __webpack_require__(56);
 	var ReactPerf = __webpack_require__(57);
 	var ReactReconciler = __webpack_require__(58);
 	var Transaction = __webpack_require__(61);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	var dirtyComponents = [];
 	var asapCallbackQueue = CallbackQueue.getPooled();
@@ -7011,11 +7115,11 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
-	var PooledClass = __webpack_require__(5);
+	var PooledClass = __webpack_require__(6);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * A specialized pseudo-event module to help keep track of components waiting to
@@ -7469,7 +7573,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * ReactOwners are capable of storing references to owned components.
@@ -7567,7 +7671,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * `Transaction` creates a black box that is able to wrap any method such that
@@ -9073,7 +9177,7 @@
 	var createNodesFromMarkup = __webpack_require__(80);
 	var emptyFunction = __webpack_require__(11);
 	var getMarkupWrap = __webpack_require__(82);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	var OPEN_TAG_NAME_EXP = /^(<[^ \/>]+)/;
 	var RESULT_INDEX_ATTR = 'data-danger-index';
@@ -9223,7 +9327,7 @@
 
 	var createArrayFromMixed = __webpack_require__(81);
 	var getMarkupWrap = __webpack_require__(82);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Dummy container used to render all markup.
@@ -9306,7 +9410,7 @@
 	 * @typechecks
 	 */
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Convert array-like objects to arrays.
@@ -9441,7 +9545,7 @@
 
 	var ExecutionEnvironment = __webpack_require__(47);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Dummy container used to detect which wraps are necessary.
@@ -9621,7 +9725,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var AutoFocusUtils = __webpack_require__(86);
 	var CSSPropertyOperations = __webpack_require__(88);
@@ -9645,7 +9749,7 @@
 	var ReactPerf = __webpack_require__(57);
 
 	var escapeTextContentForBrowser = __webpack_require__(77);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var isEventSupported = __webpack_require__(63);
 	var keyOf = __webpack_require__(25);
 	var shallowEqual = __webpack_require__(123);
@@ -9781,6 +9885,11 @@
 	function putListener() {
 	  var listenerToPut = this;
 	  EventPluginHub.putListener(listenerToPut.inst, listenerToPut.registrationName, listenerToPut.listener);
+	}
+
+	function optionPostMount() {
+	  var inst = this;
+	  ReactDOMOption.postMountWrapper(inst);
 	}
 
 	// There are so many media events, it makes sense to just
@@ -10091,6 +10200,8 @@
 	          transaction.getReactMountReady().enqueue(AutoFocusUtils.focusDOMComponent, this);
 	        }
 	        break;
+	      case 'option':
+	        transaction.getReactMountReady().enqueue(optionPostMount, this);
 	    }
 
 	    return mountImage;
@@ -11375,8 +11486,7 @@
 	        var propName = propertyInfo.propertyName;
 	        // Must explicitly cast values for HAS_SIDE_EFFECTS-properties to the
 	        // property type before comparing; only `value` does and is string.
-	        // Must set `value` property if it is not null and not yet set.
-	        if (!propertyInfo.hasSideEffects || '' + node[propName] !== '' + value || !node.hasAttribute(propertyInfo.attributeName)) {
+	        if (!propertyInfo.hasSideEffects || '' + node[propName] !== '' + value) {
 	          // Contrary to `setAttribute`, object properties are properly
 	          // `toString`ed by IE8/9.
 	          node[propName] = value;
@@ -11660,7 +11770,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var EventConstants = __webpack_require__(39);
 	var EventPluginRegistry = __webpack_require__(42);
@@ -12181,14 +12291,14 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var DOMPropertyOperations = __webpack_require__(97);
 	var LinkedValueUtils = __webpack_require__(107);
 	var ReactDOMComponentTree = __webpack_require__(34);
 	var ReactUpdates = __webpack_require__(54);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	var didWarnValueLink = false;
@@ -12393,7 +12503,7 @@
 	var ReactPropTypes = __webpack_require__(29);
 	var ReactPropTypeLocations = __webpack_require__(22);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	var hasReadOnlyValue = {
@@ -12529,9 +12639,10 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
-	var ReactChildren = __webpack_require__(4);
+	var ReactChildren = __webpack_require__(5);
+	var ReactDOMComponentTree = __webpack_require__(34);
 	var ReactDOMSelect = __webpack_require__(109);
 
 	var warning = __webpack_require__(10);
@@ -12571,6 +12682,15 @@
 	    }
 
 	    inst._wrapperState = { selected: selected };
+	  },
+
+	  postMountWrapper: function (inst) {
+	    // value="" should make a value attribute (#6219)
+	    var props = inst._currentElement.props;
+	    if (props.value != null) {
+	      var node = ReactDOMComponentTree.getNodeFromInstance(inst);
+	      node.setAttribute('value', props.value);
+	    }
 	  },
 
 	  getNativeProps: function (inst, props) {
@@ -12626,7 +12746,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var LinkedValueUtils = __webpack_require__(107);
 	var ReactDOMComponentTree = __webpack_require__(34);
@@ -12844,14 +12964,14 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var DOMPropertyOperations = __webpack_require__(97);
 	var LinkedValueUtils = __webpack_require__(107);
 	var ReactDOMComponentTree = __webpack_require__(34);
 	var ReactUpdates = __webpack_require__(54);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	var didWarnValueLink = false;
@@ -12999,7 +13119,7 @@
 	var ReactChildReconciler = __webpack_require__(113);
 
 	var flattenChildren = __webpack_require__(122);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Make an update for markup to be rendered and inserted at a supplied index.
@@ -13399,7 +13519,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	var injected = false;
 
@@ -13586,13 +13706,13 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var ReactCompositeComponent = __webpack_require__(115);
 	var ReactEmptyComponent = __webpack_require__(120);
 	var ReactNativeComponent = __webpack_require__(121);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	// To avoid a cyclic dependency, we create the final class in this module
@@ -13703,11 +13823,11 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var ReactComponentEnvironment = __webpack_require__(112);
 	var ReactCurrentOwner = __webpack_require__(9);
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactErrorUtils = __webpack_require__(44);
 	var ReactInstanceMap = __webpack_require__(116);
 	var ReactInstrumentation = __webpack_require__(17);
@@ -13719,7 +13839,7 @@
 	var ReactUpdateQueue = __webpack_require__(118);
 
 	var emptyObject = __webpack_require__(20);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var shouldUpdateReactComponent = __webpack_require__(119);
 	var warning = __webpack_require__(10);
 
@@ -14548,9 +14668,9 @@
 
 	'use strict';
 
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	var ReactNodeTypes = {
 	  NATIVE: 0,
@@ -14595,7 +14715,7 @@
 	var ReactInstanceMap = __webpack_require__(116);
 	var ReactUpdates = __webpack_require__(54);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	function enqueueUpdate(internalInstance) {
@@ -14894,9 +15014,9 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	var autoGenerateWrapperClass = null;
 	var genericComponentClass = null;
@@ -15120,7 +15240,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var emptyFunction = __webpack_require__(11);
 	var warning = __webpack_require__(10);
@@ -15494,7 +15614,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var DOMLazyTree = __webpack_require__(74);
 	var ReactDOMComponentTree = __webpack_require__(34);
@@ -15559,7 +15679,7 @@
 
 	'use strict';
 
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 
 	/**
 	 * Return the lowest common ancestor of A and B, or null if they are in
@@ -15699,7 +15819,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var DOMChildrenOperations = __webpack_require__(73);
 	var DOMLazyTree = __webpack_require__(74);
@@ -15707,7 +15827,7 @@
 	var ReactPerf = __webpack_require__(57);
 
 	var escapeTextContentForBrowser = __webpack_require__(77);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var validateDOMNesting = __webpack_require__(124);
 
 	/**
@@ -15874,7 +15994,7 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var ReactUpdates = __webpack_require__(54);
 	var Transaction = __webpack_require__(61);
@@ -15947,11 +16067,11 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var EventListener = __webpack_require__(130);
 	var ExecutionEnvironment = __webpack_require__(47);
-	var PooledClass = __webpack_require__(5);
+	var PooledClass = __webpack_require__(6);
 	var ReactDOMComponentTree = __webpack_require__(34);
 	var ReactUpdates = __webpack_require__(54);
 
@@ -16284,10 +16404,10 @@
 
 	'use strict';
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var CallbackQueue = __webpack_require__(55);
-	var PooledClass = __webpack_require__(5);
+	var PooledClass = __webpack_require__(6);
 	var ReactBrowserEventEmitter = __webpack_require__(102);
 	var ReactInputSelection = __webpack_require__(134);
 	var Transaction = __webpack_require__(61);
@@ -17543,7 +17663,7 @@
 
 	var emptyFunction = __webpack_require__(11);
 	var getEventCharCode = __webpack_require__(148);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var keyOf = __webpack_require__(25);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
@@ -19055,7 +19175,7 @@
 
 	// Don't try to save users less than 1.2ms (a number I made up)
 
-	var _assign = __webpack_require__(8);
+	var _assign = __webpack_require__(4);
 
 	var DONT_CARE_THRESHOLD = 1.2;
 	var DOM_OPERATION_TYPES = {
@@ -19274,7 +19394,7 @@
 	var ReactDOMComponentTree = __webpack_require__(34);
 	var ReactDOMContainerInfo = __webpack_require__(157);
 	var ReactDOMFeatureFlags = __webpack_require__(158);
-	var ReactElement = __webpack_require__(7);
+	var ReactElement = __webpack_require__(8);
 	var ReactFeatureFlags = __webpack_require__(56);
 	var ReactInstrumentation = __webpack_require__(17);
 	var ReactMarkupChecksum = __webpack_require__(159);
@@ -19285,7 +19405,7 @@
 
 	var emptyObject = __webpack_require__(20);
 	var instantiateReactComponent = __webpack_require__(114);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var setInnerHTML = __webpack_require__(78);
 	var shouldUpdateReactComponent = __webpack_require__(119);
 	var warning = __webpack_require__(10);
@@ -19985,7 +20105,7 @@
 	var ReactInstanceMap = __webpack_require__(116);
 
 	var getNativeComponentFromComposite = __webpack_require__(164);
-	var invariant = __webpack_require__(6);
+	var invariant = __webpack_require__(7);
 	var warning = __webpack_require__(10);
 
 	/**
