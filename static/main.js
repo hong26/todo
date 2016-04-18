@@ -107,6 +107,7 @@ const Todos = React.createClass({
     const todos = this.state.todos.filter((item) => {
       return item.id !=id
     })
+    // console.log(todos.length)
 
   const com=[]
   for(let i=0;i<todos.length;i++){
@@ -117,7 +118,8 @@ const Todos = React.createClass({
   }
   let all=false
   // console.log(com.length)
-  if(com.length===0 && Object.keys(localStorage).length !== 0){
+// todos.length可以写为Object.keys(localStorage).length(localStorage的所有key的长度)不等于0
+  if(com.length===0 && todos.length !== 0){
     all=true
   }else{
     all=false

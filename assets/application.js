@@ -189,6 +189,7 @@
 	    var todos = this.state.todos.filter(function (item) {
 	      return item.id != id;
 	    });
+	    // console.log(todos.length)
 
 	    var com = [];
 	    for (var i = 0; i < todos.length; i++) {
@@ -199,7 +200,8 @@
 	    }
 	    var all = false;
 	    // console.log(com.length)
-	    if (com.length === 0 && Object.keys(localStorage).length !== 0) {
+	    // todos.length可以写为Object.keys(localStorage).length(localStorage的所有key的长度)不等于0
+	    if (com.length === 0 && todos.length !== 0) {
 	      all = true;
 	    } else {
 	      all = false;
