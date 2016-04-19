@@ -30,9 +30,8 @@ const Todos = React.createClass({
     }
 
       for(let i=0; i<todos.length; i++){
-        while(todos[i].done===false){
+        if(todos[i].done===false){
              com.push(todos[i])
-             break
         }
     }
     // console.log(todos.length)
@@ -73,18 +72,12 @@ const Todos = React.createClass({
     // JSON.stringify() 方法可以将任意的 JavaScript 值序列化成 JSON 字符串
     localStorage.setItem('id:'+todo.id, JSON.stringify(todo))
     const completed=this.state.completed+1
-    let all=false
-    if(completed===0){
-      all=true
-    }else{
-      all=false
-    }
 
     this.setState({
       // concat() 方法用于连接两个或多个数组。
       todos:this.state.todos.concat([todo]),
       title:'',
-      alldone:all,
+      alldone:false,
       completed:completed
     })
   },
@@ -111,9 +104,8 @@ const Todos = React.createClass({
 
   const com=[]
   for(let i=0;i<todos.length;i++){
-    while(todos[i].done===false){
+    if(todos[i].done===false){
       com.push(todos[i])
-      break
     }
   }
   let all=false
@@ -131,7 +123,7 @@ const Todos = React.createClass({
     alldone:all
   })
   },
-
+// 勾选按钮
 handleClick(key,event){
   const todo = JSON.parse(localStorage.getItem('id:'+key))
   // console.log(todo)
@@ -163,6 +155,8 @@ handleClick(key,event){
   }
   const com=[]
   for(let i=0;i<todos.length;i++){
+    //while循环,只要条件为true就会一直循环下去,所以要加break阻止循环.
+    //下面例子不推荐使用while,用if写更简便
     while(todos[i].done===false){
       com.push(todos[i])
       break
@@ -178,16 +172,16 @@ handleClick(key,event){
     alldone:all
   })
 },
+// 全选按钮
 selectAll(event){
   const todos = this.state.todos
   let all=this.state.alldone
   let count=0
   if(all===false && todos.length!==0){
     for(let i=0; i<todos.length; i++){
-      while(todos[i].done===false){
+      if(todos[i].done===false){
         todos[i].done=true
         localStorage.setItem('id:'+todos[i].id, JSON.stringify(todos[i]))
-        break//这里的break可以不写
       }
     }
     all=true
@@ -195,10 +189,9 @@ selectAll(event){
   }
   else{
     for(let i=0; i<todos.length; i++){
-      while(todos[i].done===true){
+      if(todos[i].done===true){
         todos[i].done=false
         localStorage.setItem('id:'+todos[i].id, JSON.stringify(todos[i]))
-        break//这里的break可以不写
       }
     }
     all=false

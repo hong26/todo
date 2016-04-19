@@ -109,9 +109,8 @@
 	    }
 
 	    for (var i = 0; i < todos.length; i++) {
-	      while (todos[i].done === false) {
+	      if (todos[i].done === false) {
 	        com.push(todos[i]);
-	        break;
 	      }
 	    }
 	    // console.log(todos.length)
@@ -153,18 +152,12 @@
 	    // JSON.stringify() 方法可以将任意的 JavaScript 值序列化成 JSON 字符串
 	    localStorage.setItem('id:' + todo.id, JSON.stringify(todo));
 	    var completed = this.state.completed + 1;
-	    var all = false;
-	    if (completed === 0) {
-	      all = true;
-	    } else {
-	      all = false;
-	    }
 
 	    this.setState({
 	      // concat() 方法用于连接两个或多个数组。
 	      todos: this.state.todos.concat([todo]),
 	      title: '',
-	      alldone: all,
+	      alldone: false,
 	      completed: completed
 	    });
 	  },
@@ -193,9 +186,8 @@
 
 	    var com = [];
 	    for (var i = 0; i < todos.length; i++) {
-	      while (todos[i].done === false) {
+	      if (todos[i].done === false) {
 	        com.push(todos[i]);
-	        break;
 	      }
 	    }
 	    var all = false;
@@ -213,6 +205,8 @@
 	      alldone: all
 	    });
 	  },
+
+	  // 勾选按钮
 	  handleClick: function handleClick(key, event) {
 	    var todo = JSON.parse(localStorage.getItem('id:' + key));
 	    // console.log(todo)
@@ -244,6 +238,8 @@
 	    }
 	    var com = [];
 	    for (var _i = 0; _i < todos.length; _i++) {
+	      //while循环,只要条件为true就会一直循环下去,所以要加break阻止循环.
+	      //下面例子不推荐使用while,用if写更简便
 	      while (todos[_i].done === false) {
 	        com.push(todos[_i]);
 	        break;
@@ -259,26 +255,26 @@
 	      alldone: all
 	    });
 	  },
+
+	  // 全选按钮
 	  selectAll: function selectAll(event) {
 	    var todos = this.state.todos;
 	    var all = this.state.alldone;
 	    var count = 0;
 	    if (all === false && todos.length !== 0) {
 	      for (var i = 0; i < todos.length; i++) {
-	        while (todos[i].done === false) {
+	        if (todos[i].done === false) {
 	          todos[i].done = true;
 	          localStorage.setItem('id:' + todos[i].id, JSON.stringify(todos[i]));
-	          break; //这里的break可以不写
 	        }
 	      }
 	      all = true;
 	      count = 0;
 	    } else {
 	      for (var _i2 = 0; _i2 < todos.length; _i2++) {
-	        while (todos[_i2].done === true) {
+	        if (todos[_i2].done === true) {
 	          todos[_i2].done = false;
 	          localStorage.setItem('id:' + todos[_i2].id, JSON.stringify(todos[_i2]));
-	          break; //这里的break可以不写
 	        }
 	      }
 	      all = false;
